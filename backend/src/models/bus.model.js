@@ -46,7 +46,6 @@ const busSchema = new mongoose.Schema(
     // Auto increment bus ID
     busId: {
       type: Number,
-      required: true,
       unique: true,
     },
 
@@ -105,20 +104,12 @@ const busSchema = new mongoose.Schema(
   }
 );
 
-// Get next bus ID
-const getNextBusId = async () => {
-  const lastBus = await Bus.findOne().sort({ busId: -1 }); // get the bus with highest busId
-
-  return lastBus ? lastBus.busId + 1 : 1; // increment from the last busId, or start from 1
-};
-
-// Pre-save hook to assign busId before saving
-busSchema.pre("save", async function (next) {
-  if (!this.busId) {
-    this.busId = await getNextBusId();
+// Pre-validate hook to assign busId before validation runs
+busSchema.pre("validate", async function () {
+  if (this.isNew && !this.busId) {
+    const lastBus = await mongoose.model("Bus").findOne().sort({ busId: -1 });
+    this.busId = lastBus && lastBus.busId ? lastBus.busId + 1 : 1;
   }
-
-  next();
 });
 
 // Create model

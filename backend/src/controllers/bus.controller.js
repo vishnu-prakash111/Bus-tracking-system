@@ -122,30 +122,28 @@ const getBusById = async (req, res) => {
 
 const updateBus = async (req, res) => {
   try {
-    const {
-      busName,
-      busNumber,
-      driver,
-      driverNumber,
-      route,
-      busStops,
-      status,
-      isActive,
-    } = req.body;
+    const updateData = {};
+    const allowedFields = [
+      "busName",
+      "busNumber",
+      "driver",
+      "driverNumber",
+      "route",
+      "busStops",
+      "status",
+      "isActive",
+    ];
+
+    allowedFields.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        updateData[field] = req.body[field];
+      }
+    });
 
     const bus = await Bus.findByIdAndUpdate(
       req.params.id,
       {
-        $set: {
-          busName,
-          busNumber,
-          driver,
-          driverNumber,
-          route,
-          busStops,
-          status,
-          isActive,
-        },
+        $set: updateData,
       },
       {
         new: true,

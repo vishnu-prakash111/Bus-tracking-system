@@ -111,22 +111,19 @@ const getRouteById = async (req, res) => {
 
 const updateRoute = async (req, res) => {
   try {
-    const {
-      routeName,
-      source,
-      destination,
-      stops,
-    } = req.body;
+    const updateData = {};
+    const allowedFields = ["routeName", "source", "destination", "stops", "isActive"];
+
+    allowedFields.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        updateData[field] = req.body[field];
+      }
+    });
 
     const route = await BusRoute.findByIdAndUpdate(
       req.params.id,
       {
-        $set: {
-          routeName,
-          source,
-          destination,
-          stops,
-        },
+        $set: updateData,
       },
       {
         new: true,

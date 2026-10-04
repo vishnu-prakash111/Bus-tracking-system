@@ -25,11 +25,25 @@ app.use(
   })
 );
 
-app.use(express.json());
+app.use(express.json({ limit: "16kb" }));
 
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 
 app.use(cookieParser());
+
+
+// ================================
+// HEALTH CHECK ROUTE
+// ================================
+
+app.get("/api/v1/health", (req, res) => {
+  return res.status(200).json({
+    success: true,
+    message: "Bus tracking server is healthy",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
+});
 
 
 // ================================

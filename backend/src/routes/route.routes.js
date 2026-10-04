@@ -8,23 +8,23 @@ import {
   deleteRoute,
 } from "../controllers/route.controller.js";
 
-import authMiddleware from "../middlewares/auth.middleware.js";
+import { authMiddleware, authorizeRoles } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-// create routes
-router.post("/create", authMiddleware, createRoute);
+// create routes (admin only - supports both POST / and POST /create)
+router.post("/", authMiddleware, authorizeRoles("admin"), createRoute);
+router.post("/create", authMiddleware, authorizeRoles("admin"), createRoute);
 
-// get all the routes details
-router.get("/", authMiddleware, getAllRoutes);
+// get routes details (public for passengers and drivers)
+router.get("/", getAllRoutes);
+router.get("/:id", getRouteById);
 
-// get routes by id
-router.get("/:id", authMiddleware, getRouteById);
+// update routes (admin only)
+router.patch("/:id", authMiddleware, authorizeRoles("admin"), updateRoute);
+router.put("/:id", authMiddleware, authorizeRoles("admin"), updateRoute);
 
-// update routes
-router.patch("/:id", authMiddleware, updateRoute);
-
-// delete routes
-router.delete("/:id", authMiddleware, deleteRoute);
+// delete routes (admin only)
+router.delete("/:id", authMiddleware, authorizeRoles("admin"), deleteRoute);
 
 export default router;
